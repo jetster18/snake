@@ -1,0 +1,70 @@
+:root {
+  --game-block-size: 100px;
+  --border-color: rgb(192, 192, 192);
+  /* cursor: none; */ 
+}
+
+div {
+  position: absolute;
+}
+
+body {
+  background-color: gray;
+  margin: unset;
+  
+  overflow: none;
+  /* background-image: url("https://payload.cargocollective.com/1/5/179769/12467824/leaf-pattern-thank-you-web_1000.jpg"); */
+  background-color: rgb(67, 143, 67);
+  
+}
+
+#border{
+  position: fixed;
+  /* width: calc(100% - 200px);//let's calculate this in javascript 
+  height: 700px;
+  border: 100px solid var(--border-color);
+  border-bottom: 190px solid var(--border-color);
+  border-right: 120px solid var(--border-color); */
+}
+
+.snake-head, .snake-body, .snake-food {
+  width: var(--game-block-size);
+  height: var(--game-block-size);
+  box-shadow: 1px 1px 1px white;
+  transform: translate(calc(var(--game-block-size)), calc(var(--game-block-size)*2));
+}
+
+.snake-head {
+  background-color: rgb(3, 77, 13);
+}
+
+.snake-body {
+  background-color: rgba(128, 0, 128, 0.363);
+}
+
+.snake-food{
+  background-color: rgb(255, 0, 0);
+  z-index: -1;
+}
+
+.fake-food {
+  background-color: gray;
+  box-shadow: none;
+}
+
+.header{
+  margin: auto;
+  width: 100%;
+  text-align: center;
+  font-size: 10vh;
+}
+
+.header > span {
+  font-size: 3vh;
+}
+
+@keyframes spin {
+  50% {
+    transform: rotate(180deg);
+  }
+}
