@@ -63,6 +63,25 @@ body {
   font-size: 3vh;
 }
 
+.board-size{
+  position: absolute;
+  right: 50vw;
+  font-size: 2vh;
+  
+}
+
+.board-size.right{
+  margin-right: 1.5vw;
+}
+.board-size.left{
+  margin-right: -1.5vw;
+}
+
+.clear-cookies{
+  position: absolute;
+  z-index: 1;
+}
+
 @keyframes spin {
   50% {
     transform: rotate(180deg);

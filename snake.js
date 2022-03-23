@@ -4,19 +4,30 @@ var edgeGuard = 0;
 var gridWidth = 0;
 var gridHeight = 0;
 var highScore = 0;
+var gameWidth, gameHeight;
+
+function GetCookieHighScoreName(){
+  return 'highscore'+gameWidth+gameHeight;
+}
 
 window.addEventListener('load', () => {
-  pixels = GetSnakeHead().offsetWidth;
-  edgeGuard = (pixels);
-  gridWidth = Math.floor(window.innerWidth - 200);
-  gridHeight = Math.floor(window.innerHeight - 200);
+
   SetScreenSize();
   Reset();
   SetupCookieInfo();
 });
 
+window.addEventListener('resize', () => {
+  console.log("window was resized");
+  SetScreenSize();
+  ClearSnakeSize(false);
+  InitializeFood();
+  SetupCookieInfo();
+})
+
 function SetupCookieInfo(){
- highScore = GetCookie('highscore');
+ highScore = GetCookie(GetCookieHighScoreName());
+ document.getElementById('high-score').innerHTML = highScore ? highScore : 0;
 }
 
 function Reset(){
@@ -26,12 +37,20 @@ function Reset(){
 
 function SetScreenSize(){
 
+  pixels = Math.round(GetSnakeHead().offsetWidth/100)*100;
+  edgeGuard = (pixels);
+  gridWidth = Math.floor(window.innerWidth - 200);
+  gridHeight = Math.floor(window.innerHeight - 200);
   // modulo by pixel size
   var rightMod = window.innerWidth % pixels; // 20 pixels too many (shave off on right side)
   var bottomMod = window.innerHeight % pixels; // shave off 80 pixels
 
-  var gameWidth = window.innerWidth - rightMod - (2 * pixels);
-  var gameHeight = window.innerHeight - bottomMod - (2 * pixels);
+  gameWidth = window.innerWidth - rightMod - (2 * pixels);
+  gameHeight = window.innerHeight - bottomMod - (2 * pixels);
+
+  document.getElementById('game-width').innerHTML = gameWidth / 100;
+  document.getElementById('game-height').innerHTML = gameHeight / 100;
+
 
   var elem = document.getElementById('border');
   elem.style.border = '100px solid var(--border-color)';
@@ -218,13 +237,21 @@ function MoveSnake(x, y){
   
   //keep contained in the screen
   //let's say width of the block + 1
+  deltaX = Math.round(deltaX/10) * 10;
+  deltaY = Math.round(deltaY/10) * 10;
 
+  deltaX = Math.round(deltaX/100) * 100;
+  deltaY = Math.round(deltaY/100) * 100;
+  
   // if (deltaX / pixels < gridWidth && deltaX > edgeGuard && deltaY < window.innerHeight - edgeGuard && deltaY > edgeGuard)
   if (deltaX < gridWidth && deltaX > 0 && deltaY < gridHeight && deltaY > 0)
   {
+    //round to nearest 10s, then 100s
+    //let's make usre we aren't having issues with floating points
+
     CascadeSnakeBodyMovement();
     GetSnakeHead().style.transform = "translate(" + deltaX + "px, " + deltaY + "px)";
-    // console.log('snake head moved to: X: ' + deltaX + ' Y: ' + deltaY);
+    console.log('snake head moved to: X: ' + deltaX + ' Y: ' + deltaY);
     DetectCollision();
   }else {
     // console.log("too far off the page");
@@ -274,9 +301,9 @@ function SetScore(score){
   document.getElementById("score").innerHTML = score;
   if (score > highScore){
     highScore = score;
+    SetCookie(GetCookieHighScoreName(), highScore, 30);
   }
   document.getElementById('high-score').innerHTML = highScore;
-  SetCookie("highscore", highScore, 30);
   // document.cookie = "highscore=" + highScore
 }
 
@@ -301,8 +328,10 @@ function DecreaseSnakeLength(){
 }
 
 
-function ClearSnakeSize(){
-  PlaySound('eat-yourself');
+function ClearSnakeSize(playSound = true){
+  if (playSound){
+    PlaySound('eat-yourself');
+  }
   document.querySelectorAll('.snake-body').forEach(box => {box.remove()})
   Reset();
 }
@@ -334,5 +363,10 @@ function SetCookie(cName, cValue, expDays) {
   let date = new Date();
   date.setTime(date.getTime() + (expDays * 24 * 60 * 60 * 1000));
   const expires = "expires=" + date.toUTCString();
-  document.cookie = cName + "=" + cValue + "; " + expires + "; path=/ max-age=31536000";
+  document.cookie = cName + "=" + cValue + "; " + expires + "; path=/;max-age=31536000; secure; domain=localhost";
+}
+
+document.ClearCookies = function(){
+  document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+  SetupCookieInfo();
 }
